@@ -58,7 +58,7 @@ using namespace std;
     }
 
 /*****************************************结构体定义部分******************************************/
-#define IP "172.21.0.7"
+#define IP "127.0.0.1"
 #define PORT 2000
 #define THREADNUM 10
 #define MAXEVENTS 10

@@ -7,7 +7,7 @@ class MyLog
 public:
     MyLog()
     {
-        db.initDB("localhost", "root", "123", "Netdisk");
+        db.initDB("localhost", "root", "123456", "Netdisk");
     }
 
     void insert(const string &user, const string &operation)

@@ -62,7 +62,7 @@ int main()
     /************************启动服务器,并连接服务器数据库************************************/
     chdir("../workspace/");
     MyDb db;
-    db.initDB("localhost", "root", "123", "Netdisk");
+    db.initDB("localhost", "root", "123456", "Netdisk");
     string sql;
     int dataLen = 0;
     char buf[1000] = {0};
@@ -164,6 +164,9 @@ int main()
                     {
                         flag = true;
                         string salt(GenerateStr(8));
+                        //crypt函数是个密码加密函数，它是基于Data Encryption Standard(DES)演算法
+                        //crypt()将参数key所指的字符串加以加密，key字符串长度仅取前8个字符，超过此长度的字符没有意义。
+                        //编码过的字符串长度为13个字符，前两个字符为参数salt代表的字符串。
                         string cipher(crypt(order2.c_str(), salt.c_str()));
                         sql = "INSERT INTO Shadow Values('" + name + "','" + order2 + "','" + salt + "','" + cipher + "')";
                         cout << sql << endl;

@@ -64,7 +64,7 @@ int childHandle(const Task &task)
     off_t filesize;
     //分析任务包的命令
     int sockfd = task.fd;
-    stringstream ss(task.orders);
+    stringstream ss(task.orders);//数据格式化为字符串
     cout << "ChildHandle:" << task.orders << endl;
     string order, name, order2; //order代表命令，name代表跟在name后面的文件名，order2代表补充命令（可为空）
     ss >> order >> name >> order2;
@@ -120,13 +120,15 @@ int childHandle(const Task &task)
         {
             flag = false;
             sendCycle(sockfd, &flag, 1);
-            int file_fd = open(md5.c_str(), O_RDWR | O_CREAT, 0666);
+            int file_fd = open(md5.c_str(), O_RDWR | O_CREAT, 0666);//0666,均拥有rw权限
             ERROR_CHECK(file_fd, -1, "open");
             //接收文件大小
             bzero(buf, sizeof(buf));
             recvCycle(sockfd, &dataLen, sizeof(int));
             recvCycle(sockfd, buf, dataLen);
+            //从源source所指的内存地址的起始位置开始拷贝n个字节到目标destin所指的内存地址的起始位置中，返回指向目标存储区destin的指针
             memcpy(&filesize, buf, dataLen);
+            //将参数fd指定的文件大小改为参数length指定的大小，超出部分会被删除
             ftruncate(file_fd, filesize);
             //接收文件内容
             bzero(buf, sizeof(buf));
@@ -151,12 +153,12 @@ int childHandle(const Task &task)
                     if (download - lastsize > slice)
                     {
                         printf("\r%5.2f%%", (float)download / filesize * 100);
-                        fflush(stdout);
+                        fflush(stdout);//强迫将缓冲区内的数据写回参数stream 指定的文件中。
                         lastsize = download;
                     }
                 }
             }
-            ret = munmap(pmap, filesize);
+            ret = munmap(pmap, filesize);//取消参数start所指的映射内存起始地址，参数length则是欲取消的内存大小
             ERROR_CHECK(ret, -1, "munmap");
             close(file_fd);
         }
@@ -209,6 +211,7 @@ int childHandle(const Task &task)
         //传送文件内容
         char *pmap = (char *)mmap(NULL, filesize, PROT_READ, MAP_SHARED, file_fd, 0);
         ERROR_CHECK(pmap, (char *)-1, "mmap");
+        //offset是文件中映射的起始位置
         off_t offset = beginPos, lastsize = beginPos;
         off_t slice = filesize / 100;
         while (1)
